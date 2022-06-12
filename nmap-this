@@ -1,0 +1,165 @@
+#!/usr/bin/env python
+
+import os
+import requests
+import time
+import signal
+
+print("""\
+                                                                                                                                                      
+                                                                                           :                                                          
+                                                                                         -*.                                                          
+                                                                                      .*%-     -==:                                                   
+                                                                                    .*@*   -*@@=                                                      
+                                                                                - .*@@: -*@@%-                                                        
+                                                                              .@ -%@%-=@@@%-                                                          
+                                                                              %@*@@@*@@@%-                                                            
+                                                                             %@@@@@@@@@-                                                              
+                                                                            =@@@@@@@@*.                                                               
+                                                                            @@@@@@@@.                                                                 
+                                                                     .     *@@@@@@=                                                                   
+                                                                     *@**--@@@@@%.                                                                    
+                                                                      @- -**%@@@.                                                                     
+                                                            :----******@.     @@@@#*****---:                                                          
+                                                    .-=**%@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@**=-.                                                  
+                                               -=*%@@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@@@@@@@%*=-                                             
+                                          .-*@@@@@@@@@@@@@@@@@@@@@@@@@@@-     *@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-.                                        
+                                        =@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:      =@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=                                      
+                                    --#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+         %@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-.                                 
+                                 =*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-     -      *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-.                             
+                             .-%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+-        =       -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=:                          
+                          -=@@@@@@@@@@@@@@@@@@@@@@@@%*@@@@@@*.         .@.    :   -@@@@@@@@@@@@@@@@%@@@@@@@@@@@@@@@@@@@@@@@@%*.                       
+                       .*%@@@@@@@@@@@@@@@@@@@@@@%*- -@@@@%-          .*=      +-    %@@@@@@@@@@@@@@%-.-+*@@@@@@@@@@@@@@@@@@@@@@@=-                    
+                    -=@@@@@@@@@@@@@@@@@@@@@@@*=    -@@%+-         -**-         *-   -@@@@@@@@@@@@@@@@=    -+@@@@@@@@@@@@@@@@@@@@@@%*-                 
+                 -*%@@@@@@@@@@@@@@@@@@@@@@=-      -@@*         -**-             =-   @@@@@@@@@@@@@@@@@#.     .-*@@@@@@@@@@@@@@@@@@@@@@*.              
+              .*%@@@@@@@@@@@@@@@@@@@@@%-.        -@@.       -=*-          :  .   -*   @@@@@@@@@@@@@@@@@%         :=*@@@@@@@@@@@@@@@@@@@@@=            
+            =@@@@@@@@@@@@@@@@@@@@@@*-           -@%       -%*.           =   @    *-  %@@@@@@@@@@@@@@@@@@.          .-#@@@@@@@@@@@@@@@@@@@@%-         
+         -%@@@@@@@@@@@@@@@@@@@@%*:              @@.      =*.           :*.   -*    @- =@@@@@@@@@@@@@@@@@@*              -*@@@@@@@@@@@@@@@@@@@@*.      
+      .*@@@@@@@@@@@@@@@@@@@@@=-                *@*     -%-          ---.      -*.   % =@@@@@@@@@@@@@@@@@@@                 -*@@@@@@@@@@@@@@@@@@@@=    
+    .*@@@@@@@@@@@@@@@@@@@%*.                   @@     .@-        -*=            *   # =@@@@@@@@@@@@@@@@@@@*                   =*@@@@@@@@@@@@@@@@@@@=  
+  .*@@@@@@@@@@@@@@@@@@@*-                      @@     %-       -%.              :@  =+=@@@@@@@@@@@@@@@@@@@@                     .-%@@@@@@@@@@@@@@@@@@=
+  %@@@@@@@@@@@@@@@@@*-                         @@     @       *=             -   *= =@=@@@@@@@@@@@@@@@@@@@@                         -#@@@@@@@@@@@@@@@@
+:@@@@@@@@@@@@@@*+***@*                         @@     @      *-          --  @.   % =@=@@@@@@@@@@@@@@@@@@@-                       =@@%-=*%@@@@@@@@@@@@
+@@@@@@@@@@@@=-=*@@@@@=                          @@    =*     *         -*.   :=   @ =@+@@@@@@@@@@@@@@@@@@@                        .@@@@@@*--*@@@@@@@@@
+@@@@@@@@@@@*-**@******-                         *@+    @*    =        .*      @   @ +.@@@@@@@@@@@@@@@@@@@=                        ---+*****-+%@@@@@@@@
+ *@@@@@@@@@@@@@@@@@@@@@%**--:                    @@=    **   %        @       @   @ @ @@@@@@@@@@@@@@@@@@*                  ---**@@@@@@@@@@@@@@@@@@@@@@
+  :@@@@@@@@@@@@@@@@@@@@@@@@@@@@==                 #@=    #=  #=       @       @   @ =@@@@@@@@@@@@@@@@@@#               ==@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
+     ---***@@@@@@@@@@@@@@@@@@@@@@@@*--.           .*@*.   *+ -@-      @       @  :*@=@@@@@@@@@@@@@@@@@*.          --*@@@@@@@@@@@@@@@@@@@@@@@@***---   
+              .---**@@@@@@@@@@@@@@@@@@@@%*=-        =@@=.  =@.-@*     *-      @  @%**@@@@@@@@@@@@@@@@-      :-**@@@@@@@@@@@@@@@@@@@@***--.            
+                       --*@@@@@@@@@@@@@@@@@@@@*--     =#@%-  **-*%-    %-    :% =@@*@@@@@@@@@@@@@@@=   .-**@@@@@@@@@@@@@@@@@@@**--                    
+                            -=*@@@@@@@@@@@@@@@@@@@@*=-.  =*@*-:+*-*%-  .@-   @=-@@@@@@@@@@@@@@@%*.-=*%@@@@@@@@@@@@@@@@@@@@*-.                         
+                                --*@@@@@@@@@@@@@@@@@@@@@@**=*=*%*@*=*%*=-#*-*@#@@@@@@@@@@@@@@%@*@@@@@@@@@@@@@@@@@@@@@@*-.                             
+                                    :-*@@@@@@@@@@@@@@@@@@@@@@@@%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-.                                 
+                                        .-*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*#@@@@@@#*@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=                                      
+                                            -*%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#=-                                         
+                                                =*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*-.                                            
+                                                   -=*%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#*-.                                                
+                                                        --***@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#**+--                                                     
+""")
+
+
+def keyboardInterruptHandler(signal, frame):
+    os.system(passw() + "kalitorify -c > /dev/null 2>&1")
+    exit()
+
+def passw():
+    return "echo " + password + " | sudo -S "
+
+def change():
+    check = False
+    while check == False:
+        os.system(passw() + "service tor restart")
+        time.sleep(2)
+        check = True
+        try:
+            requests.get("https://www.myexternalip.com/raw")
+            requests.get('https://www.' + target)
+        except:
+            check = False
+    print("Ip Changed: " + requests.get("https://www.myexternalip.com/raw").text)
+    return
+
+def read():
+    file = open("/tmp/output_nmap_tor.txt", "r")
+    writer = open(output, "a")
+    for line in file:
+        if line[0] == "|":
+            writer.write(line)
+        elif line.split(" ")[0].count("/") > 0:
+            if line.split(" ")[0].split("/")[0].isnumeric():
+                writer.write(line)
+    file.close()
+    writer.close()
+    os.remove("/tmp/output_nmap_tor.txt")
+    return
+step = 10
+password = str(input("Your root password: "))
+target = str(input("Host name: "))
+port = str(input("Port number (exemple: 0-250, blank = all) "))
+step = int(input("Step (default=10): "))
+option = str(input("Nmap Option: "))
+output = str(input("Output path file: "))
+
+if os.path.exists(output):
+    res = input(output + " already exists, Override, Append, Cancel? [O/A/C] ")
+    if res == "C" or res == "c":
+        print("Exiting")
+        exit()
+    elif res == "A" or res == "a":
+        print("Append to file")
+    elif res == "O" or res == "o":
+        os.remove(output)
+        print("Overiding")
+
+if port != "":
+    port_split = port.split("-")
+    port_start = int(port_split[0])
+    port_end = int(port_split[1])
+else:
+    port_start = 0
+    port_end = 65525
+print("Initialising...")
+os.system(passw() + "service tor stop")
+time.sleep(3)
+os.system(passw() + "kalitorify -t > /dev/null 2>&1")
+signal.signal(signal.SIGINT, keyboardInterruptHandler)
+print("Initialized, your new IP: " + requests.get("https://www.myexternalip.com/raw").text)
+res = str(input("Launch analysis? [Y/n] "))
+if res == "n" or res == "N":
+    print("Exit program")
+    exit()
+while port_start < port_end:
+    if port_end - port_start >= 10:
+        add = 10
+    else:
+        add = port_end-port_start
+    os.system("nmap " + target + " " + option + " -p " + str(port_start) + "-" + str(port_start + add) + " > /tmp/output_nmap_tor.txt")
+    port_start += 11
+    change()
+    read()
+
+print("Exiting...")
+os.system(passw() + 'kalitorify -c > /dev/null 2>&1')
+print("System reinitialied, actual IP: " + requests.get("https://www.myexternalip.com/raw").text)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
